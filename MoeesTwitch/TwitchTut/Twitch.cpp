@@ -1,5 +1,8 @@
 #include "PluginSDK.h"
 #include "Color.h"
+#include <algorithm>
+#include <sstream>
+
 
 PluginSetup("MoeeesTwitch");
 
@@ -181,6 +184,14 @@ float eDmg(IUnit* Target) //ty based rembrandt
 	return GDamage->CalcPhysicalDamage(GEntityList->Player(), Target, InitDamage);
 }
 
+float qDistance()
+{
+	float movespeed = GEntityList->Player()->MovementSpeed();
+	float timeleftQ = GBuffData->GetEndTime(GEntityList->Player()->GetBuffDataByName("globalcamouflage")) - GGame->Time();
+	float radius = movespeed * timeleftQ;
+	return radius;
+}
+
 void dmgdraw()
 {
 	if (!DrawEdmg->Enabled())
@@ -244,7 +255,6 @@ void Combo()
 
 
 }
-
 
 
 
@@ -330,6 +340,17 @@ PLUGIN_EVENT(void) OnRender()
 {
 	
 		dmgdraw();
+		if (GEntityList->Player()->HasBuff("globalcamouflage"))
+		{
+			Vec2 pos;
+			double timeleftQ = GBuffData->GetEndTime(GEntityList->Player()->GetBuffDataByName("globalcamouflage")) - GGame->Time();
+			GRender->DrawOutlinedCircle(GEntityList->Player()->GetPosition(), Vec4(255, 0, 0, 255), qDistance());
+			if (GGame->Projection(GEntityList->Player()->GetPosition(), &pos));
+				GRender->DrawTextW(Vec2(pos.x + 52, pos.y + 10), Vec4(255, 0, 0, 255), std::to_string(timeleftQ).c_str());
+			}
+			
+
+		
 	
 
 	if (DrawReady->Enabled())
@@ -386,7 +407,7 @@ PLUGIN_API void OnLoad(IPluginSDK* PluginSDK)
 	GEventManager->AddEventHandler(kEventOnRender, OnRender);
 	GEventManager->AddEventHandler(kEventOnGameUpdate, OnGameUpdate);
 	GEventManager->AddEventHandler(kEventOnPreCast, OnPreCast);
-	GRender->NotificationEx(Color::Crimson().Get(), 2, true, true, "Moeee's Twitch V1.1 Loaded!");
+	GRender->NotificationEx(Color::Crimson().Get(), 2, true, true, "Moeee's Twitch V1.2 Loaded!");
 
 
 }
@@ -397,7 +418,7 @@ PLUGIN_API void OnUnload()
 	GEventManager->RemoveEventHandler(kEventOnRender, OnRender);
 	GEventManager->RemoveEventHandler(kEventOnGameUpdate, OnGameUpdate);
 	GEventManager->RemoveEventHandler(kEventOnPreCast, OnPreCast);
-	GRender->NotificationEx(Color::Crimson().Get(), 2, true, true, "Moeee's Twitch V1.1 unLoaded Q_Q ");
+	GRender->NotificationEx(Color::Crimson().Get(), 2, true, true, "Moeee's Twitch V1.2 unLoaded Q_Q ");
 
 }
 
