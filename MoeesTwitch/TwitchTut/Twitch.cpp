@@ -37,12 +37,21 @@ IMenuOption* DrawReady;
 IMenuOption* DrawW;
 IMenuOption* DrawE;
 IMenuOption* DrawR;
+IMenuOption* DrawEdmg;
 
 ISpell2* Q;
 ISpell2* W;
 ISpell2* E;
 ISpell2* R;
 ISpell2* reCalling;
+
+
+int xOffset = 10;
+int yOffset = 15;
+int Width = 103;
+int Height = 8;
+Vec4 Color = Vec4(105, 198, 5, 255);
+Vec4 FillColor = Vec4(198, 176, 5, 255);
 
 void Menu()
 {
@@ -72,6 +81,7 @@ void Menu()
 	DrawReady = Drawings->CheckBox("Draw Ready Spells", true);
 	DrawW = Drawings->CheckBox("Draw W", true);
 	DrawE = Drawings->CheckBox("Draw E", true);
+	DrawEdmg = Drawings->CheckBox("Draw E damage", true);
 	DrawR = Drawings->CheckBox("Draw R", true);
 
 	RSettings = MainMenu->AddMenu("R Settings");
@@ -171,6 +181,37 @@ float eDmg(IUnit* Target) //ty based rembrandt
 	return GDamage->CalcPhysicalDamage(GEntityList->Player(), Target, InitDamage);
 }
 
+void dmgdraw()
+{
+	if (!DrawEdmg->Enabled())
+		return;
+	for (auto hero : GEntityList->GetAllHeros(false, true))
+	{
+		Vec2 barPos = Vec2();
+		if (hero->GetHPBarPosition(barPos) && !hero->IsDead() && hero->HasBuff("twitchdeadlyvenom"))
+		{
+			auto EDamage = eDmg(hero);
+			float percentHealthAfterDamage = max(0, hero->GetHealth() - float(EDamage)) / hero->GetMaxHealth();
+			float yPos = barPos.y + yOffset;
+			float xPosDamage = (barPos.x + xOffset) + Width * percentHealthAfterDamage;
+			float xPosCurrentHp = barPos.x + xOffset + Width * (hero->GetHealth() / hero->GetMaxHealth());
+			if (!hero->IsDead() && hero->IsValidTarget())
+			{
+				float differenceInHP = xPosCurrentHp - xPosDamage;
+				float pos1 = barPos.x + 9 + (107 * percentHealthAfterDamage);
+
+				for (int i = 0; i < differenceInHP; i++)
+				{
+					GRender->DrawLine(Vec2(pos1 + i, yPos), Vec2(pos1 + i, yPos + Height), FillColor);
+				}
+				if (!hero->IsVisible())
+				{
+
+				}
+			}
+		}
+	}
+}
 
 
 void Combo()
@@ -287,6 +328,10 @@ void JungleClear() {
 
 PLUGIN_EVENT(void) OnRender()
 {
+	
+		dmgdraw();
+	
+
 	if (DrawReady->Enabled())
 	{
 		if (W->IsReady() && DrawW->Enabled()) { GRender->DrawOutlinedCircle(GEntityList->Player()->GetPosition(), Vec4(255, 255, 0, 255), W->Range()); }
@@ -341,7 +386,7 @@ PLUGIN_API void OnLoad(IPluginSDK* PluginSDK)
 	GEventManager->AddEventHandler(kEventOnRender, OnRender);
 	GEventManager->AddEventHandler(kEventOnGameUpdate, OnGameUpdate);
 	GEventManager->AddEventHandler(kEventOnPreCast, OnPreCast);
-	GRender->NotificationEx(Color::Crimson().Get(), 2, true, true, "Moeee's Twitch V1 Loaded!");
+	GRender->NotificationEx(Color::Crimson().Get(), 2, true, true, "Moeee's Twitch V1.1 Loaded!");
 
 
 }
@@ -352,7 +397,7 @@ PLUGIN_API void OnUnload()
 	GEventManager->RemoveEventHandler(kEventOnRender, OnRender);
 	GEventManager->RemoveEventHandler(kEventOnGameUpdate, OnGameUpdate);
 	GEventManager->RemoveEventHandler(kEventOnPreCast, OnPreCast);
-	GRender->NotificationEx(Color::Crimson().Get(), 2, true, true, "Moeee's Twitch V1 unLoaded Q_Q ");
+	GRender->NotificationEx(Color::Crimson().Get(), 2, true, true, "Moeee's Twitch V1.1 unLoaded Q_Q ");
 
 }
 
