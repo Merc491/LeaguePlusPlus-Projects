@@ -17,10 +17,13 @@ IMenu* MiscMenu;
 IMenuOption* ComboQ;
 IMenuOption* ComboW;
 IMenuOption* ComboE;
+IMenuOption* ComboEstacks;
+IMenuOption* ComboEks;
 IMenuOption* ComboR;
-IMenuOption* RKayle;
 
 IMenuOption* HarassW;
+IMenuOption* HarassE;
+IMenuOption* HarassEstacks;
 IMenuOption* HarassManaManager;
 
 IMenuOption* LaneClearE;
@@ -69,9 +72,13 @@ void Menu()
 	ComboQ = ComboMenu->CheckBox("Use Q", true);
 	ComboW = ComboMenu->CheckBox("Use W", true);
 	ComboE = ComboMenu->CheckBox("Use E", true);
+	ComboEstacks = ComboMenu->AddInteger("Use E at X stacks ", 0, 6, 6);
+	ComboEks = ComboMenu->CheckBox("Only use E to KS ", false);
 	ComboR = ComboMenu->CheckBox("Use R ", true);
 
 	HarassW = HarassMenu->CheckBox("Use W", true);
+	HarassE = HarassMenu->CheckBox("Use E", true);
+	HarassEstacks = HarassMenu->AddInteger("Use E at X stacks ", 0, 6, 6);
 
 	safeQ = MiscMenu->CheckBox("Use Q if 3 or more enemies are collapsing", true);
 	recallQ = MiscMenu->CheckBox("Stealth recall", true);
@@ -244,11 +251,17 @@ void Combo()
 
 	if (ComboE->Enabled() && E->IsReady() && target->HasBuff("twitchdeadlyvenom") && player->IsValidTarget(target, E->Range()))
 	{
-		if (target->GetBuffCount("twitchdeadlyvenom") == 6 || eDmg(target) > target->GetHealth())
+		if (!ComboEks->Enabled() && (target->GetBuffCount("twitchdeadlyvenom") >= ComboEstacks->GetInteger() || eDmg(target) > target->GetHealth())) {
 			E->CastOnPlayer();
+		}
+
+		if (ComboEks->Enabled() && eDmg(target) > target->GetHealth()) {
+			E->CastOnPlayer();
+		}
+
 	}
 
-	if (ComboR->Enabled() && R->IsReady() && player->IsValidTarget(target, 975) && EnemiesInRange(player,650) >= 3)
+	if (ComboR->Enabled() && R->IsReady() && player->IsValidTarget(target, 975) && EnemiesInRange(player,975) >= 3)
 	{
 		R->CastOnPlayer();
 	}
@@ -267,7 +280,14 @@ void Harass()
 	{
 		W->CastOnTarget(target, kHitChanceMedium);
 	}
+	if (HarassE->Enabled() && E->IsReady() && target->HasBuff("twitchdeadlyvenom") && player->IsValidTarget(target, E->Range()))
+	{
+		if ((target->GetBuffCount("twitchdeadlyvenom") >= HarassEstacks->GetInteger()) || (eDmg(target) > target->GetHealth())) {
+			E->CastOnPlayer();
+		}
 
+
+	}
 }
 
 bool OnPreCast(int Slot, IUnit* Target, Vec3* StartPosition, Vec3* EndPosition)
@@ -386,7 +406,7 @@ PLUGIN_EVENT(void) OnGameUpdate()
 
 	if (GOrbwalking->GetOrbwalkingMode() == kModeMixed)
 	{
-		Combo();
+		Harass();
 	}
 
 	if (GOrbwalking->GetOrbwalkingMode() == kModeLaneClear)
@@ -407,7 +427,7 @@ PLUGIN_API void OnLoad(IPluginSDK* PluginSDK)
 	GEventManager->AddEventHandler(kEventOnRender, OnRender);
 	GEventManager->AddEventHandler(kEventOnGameUpdate, OnGameUpdate);
 	GEventManager->AddEventHandler(kEventOnPreCast, OnPreCast);
-	GRender->NotificationEx(Color::Crimson().Get(), 2, true, true, "Moeee's Twitch V1.2 Loaded!");
+	GRender->NotificationEx(Color::Crimson().Get(), 2, true, true, "Moeee's Twitch V1.3 Loaded!");
 
 
 }
@@ -418,7 +438,7 @@ PLUGIN_API void OnUnload()
 	GEventManager->RemoveEventHandler(kEventOnRender, OnRender);
 	GEventManager->RemoveEventHandler(kEventOnGameUpdate, OnGameUpdate);
 	GEventManager->RemoveEventHandler(kEventOnPreCast, OnPreCast);
-	GRender->NotificationEx(Color::Crimson().Get(), 2, true, true, "Moeee's Twitch V1.2 unLoaded Q_Q ");
+	GRender->NotificationEx(Color::Crimson().Get(), 2, true, true, "Moeee's Twitch V1.3 unLoaded Q_Q ");
 
 }
 
