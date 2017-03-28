@@ -76,9 +76,9 @@ void Menu()
 	ComboEks = ComboMenu->CheckBox("Only use E to KS ", false);
 	ComboR = ComboMenu->CheckBox("Use R ", true);
 
-	HarassW = HarassMenu->CheckBox("Use W", true);
-	HarassE = HarassMenu->CheckBox("Use E", true);
-	HarassEstacks = HarassMenu->AddInteger("Use E at X stacks ", 0, 6, 6);
+	HarassW = HarassMenu->CheckBox("Use W in harass", true);
+	HarassE = HarassMenu->CheckBox("Use E in harass", true);
+	HarassEstacks = HarassMenu->AddInteger("Use E at X stacks in harass ", 0, 6, 6);
 
 	safeQ = MiscMenu->CheckBox("Use Q if 3 or more enemies are collapsing", true);
 	recallQ = MiscMenu->CheckBox("Stealth recall", true);
@@ -276,13 +276,14 @@ void Harass()
 	auto player = GEntityList->Player();
 	auto target = GTargetSelector->FindTarget(QuickestKill, PhysicalDamage, E->Range());
 
-	if (HarassW->Enabled() && W->IsReady() && GEntityList->Player()->GetMana() > (W->ManaCost() + E->ManaCost()) && GDamage->GetAutoAttackDamage(GEntityList->Player(), target, true) * 2 < target->GetHealth() && player->IsValidTarget(target, W->Range()))
+	if (ComboW->Enabled() && W->IsReady() && GEntityList->Player()->GetMana() > (R->ManaCost() + W->ManaCost() + E->ManaCost()) && GDamage->GetAutoAttackDamage(GEntityList->Player(), target, true) * 2 < target->GetHealth() && player->IsValidTarget(target, W->Range()))
 	{
 		W->CastOnTarget(target, kHitChanceMedium);
 	}
+
 	if (HarassE->Enabled() && E->IsReady() && target->HasBuff("twitchdeadlyvenom") && player->IsValidTarget(target, E->Range()))
 	{
-		if ((target->GetBuffCount("twitchdeadlyvenom") >= HarassEstacks->GetInteger()) || (eDmg(target) > target->GetHealth())) {
+		if ((target->GetBuffCount("twitchdeadlyvenom") >= HarassEstacks->GetInteger() || eDmg(target) > target->GetHealth())) {
 			E->CastOnPlayer();
 		}
 
@@ -427,7 +428,7 @@ PLUGIN_API void OnLoad(IPluginSDK* PluginSDK)
 	GEventManager->AddEventHandler(kEventOnRender, OnRender);
 	GEventManager->AddEventHandler(kEventOnGameUpdate, OnGameUpdate);
 	GEventManager->AddEventHandler(kEventOnPreCast, OnPreCast);
-	GRender->NotificationEx(Color::Crimson().Get(), 2, true, true, "Moeee's Twitch V1.3 Loaded!");
+	GRender->NotificationEx(Color::Crimson().Get(), 2, true, true, "Moeee's Twitch V1.3.2 Loaded!");
 
 
 }
@@ -438,7 +439,7 @@ PLUGIN_API void OnUnload()
 	GEventManager->RemoveEventHandler(kEventOnRender, OnRender);
 	GEventManager->RemoveEventHandler(kEventOnGameUpdate, OnGameUpdate);
 	GEventManager->RemoveEventHandler(kEventOnPreCast, OnPreCast);
-	GRender->NotificationEx(Color::Crimson().Get(), 2, true, true, "Moeee's Twitch V1.3 unLoaded Q_Q ");
+	GRender->NotificationEx(Color::Crimson().Get(), 2, true, true, "Moeee's Twitch V1.3.2 unLoaded Q_Q ");
 
 }
 
