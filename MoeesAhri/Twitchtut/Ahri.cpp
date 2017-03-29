@@ -8,7 +8,7 @@ IMenu* ComboMenu;
 IMenu* HarassMenu;
 IMenu* LaneClearMenu;
 IMenu* JungleClearMenu;
-IMenu* RSettings;
+IMenu* ksSettings;
 IMenu* Drawings;
 IMenu* MiscMenu;
 
@@ -31,9 +31,17 @@ IMenuOption* JungleClearQ;
 IMenuOption* JungleClearE;
 IMenuOption* JungleClearManaManager;
 
+IMenuOption* Fleemode;
 IMenuOption* autoQ;
 IMenuOption* interruptE;
 IMenuOption* gapcloseE;
+IMenuOption* ComboAA;
+IMenuOption* ComboAAkey;
+IMenuOption* ComboAALevel;
+
+IMenuOption* killstealQ;
+IMenuOption* killstealW;
+IMenuOption* killstealE;
 
 IMenuOption* DrawReady;
 IMenuOption* DrawQ;
@@ -63,7 +71,7 @@ void Menu()
 	ComboMenu = MainMenu->AddMenu("Combo");
 	HarassMenu = MainMenu->AddMenu("Harass");
 	LaneClearMenu = MainMenu->AddMenu("LaneClear");
-	JungleClearMenu = MainMenu->AddMenu("JungleClear");
+	ksSettings = MainMenu->AddMenu("Kill Steal");
 	Drawings = MainMenu->AddMenu("Drawings");
 	MiscMenu = MainMenu->AddMenu("Miscs");
 
@@ -80,11 +88,17 @@ void Menu()
 	LaneClearManaManager = LaneClearMenu->AddFloat("ManaManager for Q", 0, 100, 65);
 	LaneClearMin = LaneClearMenu->AddInteger("Minimum Minions to use Q", 0, 10, 4);
 
+	killstealQ = ksSettings->CheckBox("Use Q", true);
+	killstealW = ksSettings->CheckBox("Use W", true);
+	killstealE = ksSettings->CheckBox("Use E", true);
 
-
+	Fleemode = MiscMenu->AddKey("Flee Mode", 75);
 	autoQ = MiscMenu->CheckBox("Use Q Automatically", true);
 	gapcloseE = MiscMenu->CheckBox("Use E on Gap Closers", true);
 	interruptE = MiscMenu->CheckBox("Use E for to Interrupt Spells", true);
+	ComboAALevel = MiscMenu->AddInteger("At what level disable AA", 1, 18, 6);
+	ComboAA = MiscMenu->CheckBox("Disable AA", false);
+	ComboAAkey = MiscMenu->AddKey("Disable key", 32);
 	
 
 	DrawReady = Drawings->CheckBox("Draw Ready Spells", true);
@@ -108,21 +122,28 @@ void LoadSpells()
 	Q->SetSkillshot(0.25f, 90, 1550, 870);
 	W = GPluginSDK->CreateSpell2(kSlotW, kTargetCast, false, false, kCollidesWithNothing);
 	W->SetOverrideRange(580);
-	E = GPluginSDK->CreateSpell2(kSlotE, kTargetCast, false, false, static_cast<eCollisionFlags>(kCollidesWithMinions | kCollidesWithYasuoWall));
+	E = GPluginSDK->CreateSpell2(kSlotE,kLineCast, false, false, static_cast<eCollisionFlags>(kCollidesWithMinions | kCollidesWithYasuoWall));
 	E->SetSkillshot(0.25f, 60, 1550, 950);
 	R = GPluginSDK->CreateSpell2(kSlotR, kTargetCast, false, false, kCollidesWithNothing);
 	R->SetOverrideRange(600);
 }
 
 
+static bool IsImmune(IUnit* target)
+{
+	return target->HasBuff("BlackShield") || target->HasBuff("SivirE") || target->HasBuff("NocturneShroudofDarkness") ||
+		target->HasBuff("deathdefiedbuff");
+
+}
+
 
 void CastE(IUnit* target)
 {
 	AdvPredictionOutput prediction_output;
 	E->RunPrediction(target, false, kCollidesWithYasuoWall | kCollidesWithMinions, &prediction_output);
-	if (prediction_output.HitChance >= kHitChanceHigh)
+	if (prediction_output.HitChance >= kHitChanceVeryHigh)
 	{
-		E->CastOnTarget(target, kHitChanceCollision);
+		E->CastOnPosition(prediction_output.CastPosition);
 	}
 }
 
@@ -202,7 +223,7 @@ void Combo()
 		return;
 
 
-	if (ComboE->Enabled() && E->IsReady() && player->IsValidTarget(target, E->Range()) && GEntityList->Player()->GetMana() > R->ManaCost() + E->ManaCost())
+	if (ComboE->Enabled() && E->IsReady() && player->IsValidTarget(target, E->Range()) && GEntityList->Player()->GetMana() > R->ManaCost() + E->ManaCost() && !IsImmune(target))
 	{
 			CastE(target);
 		
@@ -233,7 +254,7 @@ void Harass()
 		return;
 
 
-	if (E->IsReady() && player->IsValidTarget(target, E->Range()) && GEntityList->Player()->GetMana() > R->ManaCost() + E->ManaCost())
+	if (E->IsReady() && player->IsValidTarget(target, E->Range()) && GEntityList->Player()->GetMana() > R->ManaCost() + E->ManaCost() && !IsImmune(target))
 	{
 		CastE(target);
 
@@ -260,7 +281,7 @@ void LaneClear()
 
 	for (auto minion : GEntityList->GetAllMinions(false, true, false))
 	{
-		if (minion != nullptr && minion->IsValidTarget(GEntityList->Player(), E->Range()) && LaneClearQ->Enabled() && player->ManaPercent() >= LaneClearManaManager->GetFloat())
+		if (minion != nullptr && minion->IsValidTarget(GEntityList->Player(), Q->Range()) && LaneClearQ->Enabled() && player->ManaPercent() >= LaneClearManaManager->GetFloat())
 		{
 			Vec3 pos;
 			int Qhit;
@@ -276,10 +297,46 @@ void LaneClear()
 
 }
 
-void JungleClear() {
+void FleeMode()
+{
+	GGame->IssueOrder(GEntityList->Player(), kMoveTo, GGame->CursorPosition());
+		if (Q->IsReady())
+			Q->CastOnPosition(GEntityList->Player()->GetPosition().Extend(GGame->CursorPosition(), -400));
+
+	}
 
 
-}
+void killSteal() {
+
+	auto player = GEntityList->Player();
+	auto target = GTargetSelector->FindTarget(QuickestKill, SpellDamage, E->Range());
+
+
+		if (target == nullptr || !target->IsHero())
+			return;
+
+
+		if (killstealE->Enabled() && E->IsReady() && player->IsValidTarget(target, E->Range()) && GDamage->GetSpellDamage(GEntityList->Player(), target, kSlotE) > target->GetHealth() && !IsImmune(target))
+		{
+			CastE(target);
+
+		}
+
+
+		if (killstealQ->Enabled() && Q->IsReady() && player->IsValidTarget(target, Q->Range()) && GDamage->GetSpellDamage(GEntityList->Player(), target, kSlotQ) > target->GetHealth())
+		{
+			Q->CastOnTarget(target, kHitChanceVeryHigh);
+
+		}
+
+		if (killstealW->Enabled() && W->IsReady() && player->IsValidTarget(target, W->Range()) && GDamage->GetSpellDamage(GEntityList->Player(), target, kSlotW) > target->GetHealth())
+		{
+			W->CastOnPlayer();
+
+		}
+
+	}
+
 
 
 
@@ -378,11 +435,30 @@ PLUGIN_EVENT(void) OnGameUpdate()
 	if (GOrbwalking->GetOrbwalkingMode() == kModeLaneClear)
 	{
 		LaneClear();
-		JungleClear();
 	}
 
+	if (GetAsyncKeyState(Fleemode->GetInteger()))
+	{
+		FleeMode();
+	}
+
+	if (GetAsyncKeyState(ComboAAkey->GetInteger()))
+	{
+		auto level = GEntityList->Player()->GetLevel();
+		if (ComboAA->Enabled() && level >= ComboAALevel->GetInteger() && GEntityList->Player()->GetMana() > 100)
+		{
+			GOrbwalking->SetAttacksAllowed(false);
+		}
+	}
+	if (!GetAsyncKeyState(ComboAAkey->GetInteger()) || GEntityList->Player()->GetMana() < 100)
+	{
+		{
+			GOrbwalking->SetAttacksAllowed(true);
+		}
+	}
 
 	Automated();
+	killSteal();
 	
 }
 
