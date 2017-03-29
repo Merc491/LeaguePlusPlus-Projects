@@ -1,0 +1,15 @@
+﻿C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V140\Microsoft.CppBuild.targets(392,5): warning MSB8028: The intermediate directory (Release\) contains files shared from another project (MoeeesTwitch.vcxproj, TwitchTut.vcxproj).  This can lead to incorrect clean and rebuild behavior.
+  Ahri.cpp
+c:\users\moe\documents\github\leagueplusplus-projects\moeesahri\twitchtut\Color.h(20): warning C4244: 'argument': conversion from 'int' to 'const float', possible loss of data
+c:\users\moe\documents\github\leagueplusplus-projects\moeesahri\twitchtut\Color.h(25): warning C4244: 'argument': conversion from 'int' to 'const float', possible loss of data
+Ahri.cpp(162): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+Ahri.cpp(165): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+Ahri.cpp(168): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+Ahri.cpp(171): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+     Creating library C:\Users\Moe\Documents\GitHub\LeaguePlusPlus-Projects\MoeesAhri\Release\MoeeesAhri.lib and object C:\Users\Moe\Documents\GitHub\LeaguePlusPlus-Projects\MoeesAhri\Release\MoeeesAhri.exp
+  Generating code
+  2 of 65 functions ( 3.1%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    2 functions had inline decision re-evaluated but remain unchanged
+  Finished generating code
+  TwitchTut.vcxproj -> C:\Users\Moe\Documents\GitHub\LeaguePlusPlus-Projects\MoeesAhri\Release\MoeeesAhri.dll
