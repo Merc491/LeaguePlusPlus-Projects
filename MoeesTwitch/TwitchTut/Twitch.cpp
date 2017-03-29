@@ -277,7 +277,7 @@ void Harass()
 	auto target = GTargetSelector->FindTarget(QuickestKill, PhysicalDamage, E->Range());
 	if (target == nullptr || !target->IsHero())
 		return;
-	if (ComboW->Enabled() && W->IsReady() && GEntityList->Player()->GetMana() > (R->ManaCost() + W->ManaCost() + E->ManaCost()) && GDamage->GetAutoAttackDamage(GEntityList->Player(), target, true) * 2 < target->GetHealth() && player->IsValidTarget(target, W->Range()))
+	if (HarassW->Enabled() && W->IsReady() && GEntityList->Player()->GetMana() > (R->ManaCost() + W->ManaCost() + E->ManaCost()) && GDamage->GetAutoAttackDamage(GEntityList->Player(), target, true) * 2 < target->GetHealth() && player->IsValidTarget(target, W->Range()))
 	{
 		W->CastOnTarget(target, kHitChanceMedium);
 	}
