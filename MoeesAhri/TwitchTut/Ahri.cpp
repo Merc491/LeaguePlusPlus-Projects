@@ -114,12 +114,22 @@ void LoadSpells()
 	R->SetOverrideRange(600);
 }
 
+void CastE(IUnit* target)
+{
+	AdvPredictionOutput prediction_output;
+	E->RunPrediction(target, true, kCollidesWithYasuoWall | kCollidesWithMinions, &prediction_output);
+	if (prediction_output.HitChance >= kHitChanceVeryHigh)
+	{
+		E->CastOnTarget(target, kHitChanceCollision);
+	}
+}
+
 void AntiGapclose(GapCloserSpell const& args)
 {
 	auto player = GEntityList->Player();
 	if (gapcloseE->Enabled() && E->IsReady() && player->IsValidTarget(args.Sender, E->Range()) && args.Sender != nullptr && args.Sender != GEntityList->Player() && args.Sender->IsEnemy(GEntityList->Player()))
 	{
-		E->CastOnTarget(args.Sender, kHitChanceHigh);
+		CastE(args.Sender);
 	}
 }
 
@@ -129,9 +139,10 @@ void AntiInterrupt(InterruptibleSpell const& args)
 	auto player = GEntityList->Player();
 	if (interruptE->Enabled() && E->IsReady() && player->IsValidTarget(args.Target, E->Range()) && args.Target != nullptr && args.Target != GEntityList->Player() && args.Target->IsEnemy(GEntityList->Player()))
 	{
-		E->CastOnTarget(args.Target, kHitChanceVeryHigh);
+		CastE(args.Target);
 	}
 }
+
 
 void dmgdraw()
 {
@@ -183,7 +194,7 @@ void Combo()
 
 	if (ComboE->Enabled() && E->IsReady() && player->IsValidTarget(target, E->Range()) && GEntityList->Player()->GetMana() > R->ManaCost() + E->ManaCost())
 	{
-		E->CastOnTarget(target, kHitChanceVeryHigh);
+		CastE(target);
 
 		}
 	
@@ -210,7 +221,7 @@ void Harass()
 
 	if (E->IsReady() && player->IsValidTarget(target, E->Range()) && GEntityList->Player()->GetMana() > R->ManaCost() + E->ManaCost())
 	{
-		E->CastOnTarget(target, kHitChanceVeryHigh);
+		CastE(target);
 
 	}
 
