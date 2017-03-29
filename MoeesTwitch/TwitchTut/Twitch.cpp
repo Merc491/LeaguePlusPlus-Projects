@@ -4,7 +4,7 @@
 #include <sstream>
 
 
-PluginSetup("MoeeesTwitch");
+PluginSetup("Moeee's Twitch");
 
 IMenu* MainMenu;
 IMenu* ComboMenu;
@@ -436,7 +436,7 @@ PLUGIN_API void OnLoad(IPluginSDK* PluginSDK)
 	GEventManager->AddEventHandler(kEventOnRender, OnRender);
 	GEventManager->AddEventHandler(kEventOnGameUpdate, OnGameUpdate);
 	GEventManager->AddEventHandler(kEventOnPreCast, OnPreCast);
-	GRender->NotificationEx(Color::Crimson().Get(), 2, true, true, "Moeee's Twitch V1.3.4 Loaded!");
+	GGame->PrintChat("<font color=\"#62ff4d\"><b>Moeee's Twitch V1.4</b></font><b><font color=\"#FFFFFF\"> Loaded!</font></b>");
 
 
 }
@@ -447,7 +447,6 @@ PLUGIN_API void OnUnload()
 	GEventManager->RemoveEventHandler(kEventOnRender, OnRender);
 	GEventManager->RemoveEventHandler(kEventOnGameUpdate, OnGameUpdate);
 	GEventManager->RemoveEventHandler(kEventOnPreCast, OnPreCast);
-	GRender->NotificationEx(Color::Crimson().Get(), 2, true, true, "Moeee's Twitch V1.3.4 unLoaded Q_Q ");
 
 }
 

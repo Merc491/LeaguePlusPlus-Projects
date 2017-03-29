@@ -1,7 +1,7 @@
 #include "PluginSDK.h"
 #include "Color.h"
 
-PluginSetup("MoeeesAhri");
+PluginSetup("Moeee's Ahri");
 
 IMenu* MainMenu;
 IMenu* ComboMenu;
@@ -66,7 +66,7 @@ Vec4 FillColor = Vec4(198, 176, 5, 255);
 
 void Menu()
 {
-	MainMenu = GPluginSDK->AddMenu("MoeeesAhri");
+	MainMenu = GPluginSDK->AddMenu("Moeee's Ahri");
 
 	ComboMenu = MainMenu->AddMenu("Combo");
 	HarassMenu = MainMenu->AddMenu("Harass");
@@ -473,7 +473,7 @@ PLUGIN_API void OnLoad(IPluginSDK* PluginSDK)
 	GEventManager->AddEventHandler(kEventOnGameUpdate, OnGameUpdate);
 	GEventManager->AddEventHandler(kEventOnGapCloser, AntiGapclose);
 	GEventManager->AddEventHandler(kEventOnInterruptible, AntiInterrupt);
-
+	GGame->PrintChat("<font color=\"#ff4dee\"><b>Moeee's Ahri</b></font><b><font color=\"#FFFFFF\"> Loaded!</font></b>");
 
 }
 
