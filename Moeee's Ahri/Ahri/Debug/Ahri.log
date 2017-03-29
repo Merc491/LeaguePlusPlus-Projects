@@ -1,0 +1,9 @@
+﻿  PluginSDK.cpp
+  Ahri.cpp
+c:\users\moe\documents\visual studio 2015\projects1\ahri\ahri\ahri.cpp(183): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\users\moe\documents\visual studio 2015\projects1\ahri\ahri\ahri.cpp(186): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\users\moe\documents\visual studio 2015\projects1\ahri\ahri\ahri.cpp(189): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\users\moe\documents\visual studio 2015\projects1\ahri\ahri\ahri.cpp(192): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+  Generating Code...
+     Creating library c:\users\moe\documents\visual studio 2015\Projects1\Ahri\Debug\Ahri.lib and object c:\users\moe\documents\visual studio 2015\Projects1\Ahri\Debug\Ahri.exp
+  Ahri.vcxproj -> c:\users\moe\documents\visual studio 2015\Projects1\Ahri\Debug\Ahri.dll

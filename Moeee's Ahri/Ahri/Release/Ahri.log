@@ -1,0 +1,11 @@
+﻿  Ahri.cpp
+Ahri.cpp(183): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+Ahri.cpp(186): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+Ahri.cpp(189): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+Ahri.cpp(192): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+  PluginSDK.cpp
+     Creating library c:\users\moe\documents\visual studio 2015\Projects1\Ahri\Release\Ahri.lib and object c:\users\moe\documents\visual studio 2015\Projects1\Ahri\Release\Ahri.exp
+  Generating code
+  All 76 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  Finished generating code
+  Ahri.vcxproj -> c:\users\moe\documents\visual studio 2015\Projects1\Ahri\Release\Ahri.dll
