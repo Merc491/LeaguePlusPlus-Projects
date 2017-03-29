@@ -329,6 +329,15 @@ void Automated()
 				}
 			}
 		}
+	for (auto minion : GEntityList->GetAllMinions(false, false, true))
+	{
+		if (player->IsValidTarget(minion, E->Range()) && smiteE->Enabled() && E->IsReady() && minion->IsJungleCreep() && (eDmg(minion) > minion->GetHealth()) && E->IsReady())
+
+			E->CastOnPlayer();
+
+
+	}
+
 	}
 
 
@@ -336,8 +345,6 @@ void Automated()
 
 void LaneClear()
 {
-	auto player = GEntityList->Player();
-
 
 
 }
