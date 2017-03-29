@@ -72,12 +72,13 @@ void Menu()
 	ComboQ = ComboMenu->CheckBox("Use Q", true);
 	ComboW = ComboMenu->CheckBox("Use W", true);
 	ComboE = ComboMenu->CheckBox("Use E", true);
-	ComboEstacks = ComboMenu->AddInteger("Use E at X stacks for harass and combo ", 0, 6, 6);
+	ComboEstacks = ComboMenu->AddInteger("Use E at X stacks for combo ", 0, 6, 6);
 	ComboEks = ComboMenu->CheckBox("Only use E to KS ", false);
 	ComboR = ComboMenu->CheckBox("Use R ", true);
 
 	HarassW = HarassMenu->CheckBox("Use W in harass", true);
 	HarassE = HarassMenu->CheckBox("Use E in harass", true);
+	HarassEstacks = HarassMenu->AddInteger("Use E at X stacks for harass= ", 0, 6, 6);
 
 	safeQ = MiscMenu->CheckBox("Use Q if 3 or more enemies are collapsing", true);
 	recallQ = MiscMenu->CheckBox("Stealth recall", true);
@@ -279,8 +280,8 @@ void Harass()
 	{
 		W->CastOnTarget(target, kHitChanceMedium);
 	}
-
-	if (HarassE->Enabled() && E->IsReady() && target->HasBuff("twitchdeadlyvenom") && player->IsValidTarget(target, E->Range()))
+	
+	if (HarassE->Enabled() && E->IsReady() && player->IsValidTarget(target, E->Range()) && target->HasBuff("twitchdeadlyvenom") )
 	{
 		if ((target->GetBuffCount("twitchdeadlyvenom") >= ComboEstacks->GetInteger() || eDmg(target) > target->GetHealth())) {
 			E->CastOnPlayer();

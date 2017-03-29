@@ -1,0 +1,9 @@
+﻿  Twitch.cpp
+c:\users\moe\documents\github\leagueplusplus-projects\moeestwitch\twitchtut\color.h(20): warning C4244: 'argument': conversion from 'int' to 'const float', possible loss of data
+c:\users\moe\documents\github\leagueplusplus-projects\moeestwitch\twitchtut\color.h(25): warning C4244: 'argument': conversion from 'int' to 'const float', possible loss of data
+c:\users\moe\documents\github\leagueplusplus-projects\moeestwitch\twitchtut\twitch.cpp(162): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+c:\users\moe\documents\github\leagueplusplus-projects\moeestwitch\twitchtut\twitch.cpp(180): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
+  PluginSDK.cpp
+  Generating Code...
+     Creating library C:\Users\Moe\Documents\GitHub\LeaguePlusPlus-Projects\MoeesTwitch\x64\Debug\MoeeesTwitch.lib and object C:\Users\Moe\Documents\GitHub\LeaguePlusPlus-Projects\MoeesTwitch\x64\Debug\MoeeesTwitch.exp
+  TwitchTut.vcxproj -> C:\Users\Moe\Documents\GitHub\LeaguePlusPlus-Projects\MoeesTwitch\x64\Debug\MoeeesTwitch.dll
