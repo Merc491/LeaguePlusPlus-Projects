@@ -72,13 +72,12 @@ void Menu()
 	ComboQ = ComboMenu->CheckBox("Use Q", true);
 	ComboW = ComboMenu->CheckBox("Use W", true);
 	ComboE = ComboMenu->CheckBox("Use E", true);
-	ComboEstacks = ComboMenu->AddInteger("Use E at X stacks ", 0, 6, 6);
+	ComboEstacks = ComboMenu->AddInteger("Use E at X stacks for harass and combo ", 0, 6, 6);
 	ComboEks = ComboMenu->CheckBox("Only use E to KS ", false);
 	ComboR = ComboMenu->CheckBox("Use R ", true);
 
 	HarassW = HarassMenu->CheckBox("Use W in harass", true);
 	HarassE = HarassMenu->CheckBox("Use E in harass", true);
-	HarassEstacks = HarassMenu->AddInteger("Use E at X stacks in harass ", 0, 6, 6);
 
 	safeQ = MiscMenu->CheckBox("Use Q if 3 or more enemies are collapsing", true);
 	recallQ = MiscMenu->CheckBox("Stealth recall", true);
@@ -283,7 +282,7 @@ void Harass()
 
 	if (HarassE->Enabled() && E->IsReady() && target->HasBuff("twitchdeadlyvenom") && player->IsValidTarget(target, E->Range()))
 	{
-		if ((target->GetBuffCount("twitchdeadlyvenom") >= HarassEstacks->GetInteger() || eDmg(target) > target->GetHealth())) {
+		if ((target->GetBuffCount("twitchdeadlyvenom") >= ComboEstacks->GetInteger() || eDmg(target) > target->GetHealth())) {
 			E->CastOnPlayer();
 		}
 
@@ -428,7 +427,7 @@ PLUGIN_API void OnLoad(IPluginSDK* PluginSDK)
 	GEventManager->AddEventHandler(kEventOnRender, OnRender);
 	GEventManager->AddEventHandler(kEventOnGameUpdate, OnGameUpdate);
 	GEventManager->AddEventHandler(kEventOnPreCast, OnPreCast);
-	GRender->NotificationEx(Color::Crimson().Get(), 2, true, true, "Moeee's Twitch V1.3.2 Loaded!");
+	GRender->NotificationEx(Color::Crimson().Get(), 2, true, true, "Moeee's Twitch V1.3.3 Loaded!");
 
 
 }
@@ -439,7 +438,7 @@ PLUGIN_API void OnUnload()
 	GEventManager->RemoveEventHandler(kEventOnRender, OnRender);
 	GEventManager->RemoveEventHandler(kEventOnGameUpdate, OnGameUpdate);
 	GEventManager->RemoveEventHandler(kEventOnPreCast, OnPreCast);
-	GRender->NotificationEx(Color::Crimson().Get(), 2, true, true, "Moeee's Twitch V1.3.2 unLoaded Q_Q ");
+	GRender->NotificationEx(Color::Crimson().Get(), 2, true, true, "Moeee's Twitch V1.3.3 unLoaded Q_Q ");
 
 }
 

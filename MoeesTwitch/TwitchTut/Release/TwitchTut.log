@@ -2,9 +2,9 @@
   Twitch.cpp
 c:\users\moe\documents\github\leagueplusplus-projects\moeestwitch\twitchtut\Color.h(20): warning C4244: 'argument': conversion from 'int' to 'const float', possible loss of data
 c:\users\moe\documents\github\leagueplusplus-projects\moeestwitch\twitchtut\Color.h(25): warning C4244: 'argument': conversion from 'int' to 'const float', possible loss of data
-Twitch.cpp(173): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-Twitch.cpp(191): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
-Twitch.cpp(369): warning C4390: ';': empty controlled statement found; is this the intent?
+Twitch.cpp(172): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+Twitch.cpp(190): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
+Twitch.cpp(368): warning C4390: ';': empty controlled statement found; is this the intent?
      Creating library C:\Users\Moe\Documents\GitHub\LeaguePlusPlus-Projects\MoeesTwitch\Release\MoeeesTwitch.lib and object C:\Users\Moe\Documents\GitHub\LeaguePlusPlus-Projects\MoeesTwitch\Release\MoeeesTwitch.exp
   Generating code
   2 of 165 functions ( 1.2%) were compiled, the rest were copied from previous compilation.
