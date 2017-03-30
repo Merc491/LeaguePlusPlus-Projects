@@ -185,7 +185,8 @@ void AntiInterrupt(InterruptibleSpell const& args)
 
 Vec3 getPosToEflash(Vec3 target)
 {
-	return target + (GEntityList->Player()->GetPosition() - target) / 2;
+	
+	return  GEntityList->Player()->ServerPosition().Extend(GGame->CursorPosition(), Flash->Range());
 }
 
 void CastFlash() {
@@ -212,7 +213,7 @@ void PerformFlashCharm()
 		if (target != nullptr && target->IsValidTarget() && !target->IsDead() && !target->IsInvulnerable() && result.HitChance >= kHitChanceVeryHigh)
 		{
 			EFlash->CastOnTarget(target, kHitChanceVeryHigh);
-			GPluginSDK->DelayFunctionCall(E->GetDelay() + GGame->Latency() / 2, []() { CastFlash(); });
+			GPluginSDK->DelayFunctionCall(E->GetDelay() + GGame->Latency()*2, []() { CastFlash(); });
 
 
 
