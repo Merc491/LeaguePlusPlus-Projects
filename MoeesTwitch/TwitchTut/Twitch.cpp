@@ -239,7 +239,7 @@ void Combo()
 	if (target == nullptr || !target->IsHero())
 		return;
 
-	if (ComboQ->Enabled() && Q->IsReady() && player->IsValidTarget(target, 650) && GEntityList->Player()->GetMana() > R->ManaCost() + Q->ManaCost())
+	if (ComboQ->Enabled() && Q->IsReady() && player->IsValidTarget(target, 975) && GEntityList->Player()->GetMana() > R->ManaCost() + Q->ManaCost())
 	{
 		Q->CastOnPlayer();
 	}
