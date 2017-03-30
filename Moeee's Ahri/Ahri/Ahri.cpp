@@ -15,8 +15,6 @@ IMenu* MiscMenu;
 IMenuOption* ComboQ;
 IMenuOption* ComboW;
 IMenuOption* ComboE;
-IMenuOption* ComboR;
-IMenuOption* RKayle;
 
 IMenuOption* HarassW;
 IMenuOption* HarassE;
@@ -152,7 +150,7 @@ void AntiGapclose(GapCloserSpell const& args)
 	auto player = GEntityList->Player();
 	if (gapcloseE->Enabled() && E->IsReady() && player->IsValidTarget(args.Sender, E->Range()) && args.Sender != nullptr && args.Sender != GEntityList->Player() && args.Sender->IsEnemy(GEntityList->Player()))
 	{
-		CastE(args.Sender);
+		E->CastOnTarget(args.Sender, kHitChanceVeryHigh);
 	}
 }
 
