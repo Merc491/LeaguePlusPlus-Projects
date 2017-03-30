@@ -46,11 +46,13 @@ IMenuOption* DrawQ;
 IMenuOption* DrawW;
 IMenuOption* DrawE;
 IMenuOption* DrawR;
+IMenuOption* FlashCondemn;
 
 ISpell2* Q;
 ISpell2* W;
 ISpell2* E;
 ISpell2* R;
+ISpell2* Flash;
 
 IUnit* myHero;
 
@@ -90,13 +92,14 @@ void Menu()
 	killstealW = ksSettings->CheckBox("Use W", true);
 	killstealE = ksSettings->CheckBox("Use E", true);
 
-	Fleemode = MiscMenu->AddKey("Flee Mode", 75);
+	Fleemode = MiscMenu->AddKey("Flee Mode Key", 75);
 	autoQ = MiscMenu->CheckBox("Use Q Automatically", true);
 	gapcloseE = MiscMenu->CheckBox("Use E on Gap Closers", true);
 	interruptE = MiscMenu->CheckBox("Use E for to Interrupt Spells", true);
 	ComboAALevel = MiscMenu->AddInteger("At what level disable AA", 1, 18, 6);
 	ComboAA = MiscMenu->CheckBox("Disable AA", false);
 	ComboAAkey = MiscMenu->AddKey("Disable key", 32);
+	FlashCondemn = MiscMenu->AddKey("Flash Charm key", 84);
 
 
 	DrawReady = Drawings->CheckBox("Draw Ready Spells", true);
@@ -117,13 +120,24 @@ void LoadSpells()
 {
 
 	Q = GPluginSDK->CreateSpell2(kSlotQ, kLineCast, false, false, kCollidesWithNothing);
-	Q->SetSkillshot(0.25f, 90, 1550, 870);
+	Q->SetSkillshot(0.25f, 90, 1550, 840);
 	W = GPluginSDK->CreateSpell2(kSlotW, kTargetCast, false, false, kCollidesWithNothing);
 	W->SetOverrideRange(580);
 	E = GPluginSDK->CreateSpell2(kSlotE, kLineCast, false, false, static_cast<eCollisionFlags>(kCollidesWithMinions | kCollidesWithYasuoWall));
-	E->SetSkillshot(0.25f, 60, 1550, 950);
+	E->SetSkillshot(0.25f, 60, 1550, 930);
 	R = GPluginSDK->CreateSpell2(kSlotR, kTargetCast, false, false, kCollidesWithNothing);
 	R->SetOverrideRange(600);
+
+	if (strcmp(GEntityList->Player()->GetSpellName(kSummonerSlot1), "SummonerFlash") == 0)
+	{
+		Flash = GPluginSDK->CreateSpell2(kSummonerSlot1, kCircleCast, false, false, kCollidesWithNothing);
+		Flash->SetOverrideRange(425.f);
+	}
+	if (strcmp(GEntityList->Player()->GetSpellName(kSummonerSlot2), "SummonerFlash") == 0)
+	{
+		Flash = GPluginSDK->CreateSpell2(kSummonerSlot2, kCircleCast, false, false, kCollidesWithNothing);
+		Flash->SetOverrideRange(425.f);
+	}
 }
 
 
@@ -141,7 +155,7 @@ void CastE(IUnit* target)
 	E->RunPrediction(target, false, kCollidesWithYasuoWall | kCollidesWithMinions, &prediction_output);
 	if (prediction_output.HitChance >= kHitChanceVeryHigh)
 	{
-		E->CastOnPosition(prediction_output.CastPosition);
+		E->CastOnTarget(target, kHitChanceCollision);
 	}
 }
 
@@ -151,6 +165,29 @@ void AntiGapclose(GapCloserSpell const& args)
 	if (gapcloseE->Enabled() && E->IsReady() && player->IsValidTarget(args.Sender, E->Range()) && args.Sender != nullptr && args.Sender != GEntityList->Player() && args.Sender->IsEnemy(GEntityList->Player()))
 	{
 		E->CastOnTarget(args.Sender, kHitChanceVeryHigh);
+	}
+}
+
+void PerformFlashCharm()
+{
+	GGame->IssueOrder(GEntityList->Player(), kMoveTo, GGame->CursorPosition());
+	if (E->IsReady() && Flash->IsReady())
+	{
+		auto pushDistance = 450;
+		auto target = GTargetSelector->GetFocusedTarget() != nullptr
+			? GTargetSelector->GetFocusedTarget()
+			: GTargetSelector->FindTarget(QuickestKill, SpellDamage, E->Range());
+
+		auto flashPosition = GEntityList->Player()->ServerPosition().Extend(GGame->CursorPosition(), Flash->Range());
+		AdvPredictionOutput result;
+		E->RunPrediction(target, false, kCollidesWithMinions, &result);
+
+		if (target != nullptr && target->IsValidTarget() && !target->IsDead() && !target->IsInvulnerable() && result.HitChance >= kHitChanceVeryHigh)
+		{
+			E->CastOnTarget(target, kHitChanceVeryHigh);
+				Flash->CastOnPosition(flashPosition);
+			
+		}
 	}
 }
 
@@ -356,6 +393,11 @@ void Automated()
 			}
 
 		}
+	}
+
+	if (GetAsyncKeyState(FlashCondemn->GetInteger()) && !GGame->IsChatOpen())
+	{
+		PerformFlashCharm();
 	}
 }
 
