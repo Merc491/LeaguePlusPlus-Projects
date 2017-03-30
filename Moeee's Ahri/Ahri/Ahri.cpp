@@ -213,7 +213,7 @@ void PerformFlashCharm()
 		if (target != nullptr && target->IsValidTarget() && !target->IsDead() && !target->IsInvulnerable() && result.HitChance >= kHitChanceVeryHigh)
 		{
 			EFlash->CastOnTarget(target, kHitChanceVeryHigh);
-			GPluginSDK->DelayFunctionCall(E->GetDelay() + GGame->Latency()*2, []() { CastFlash(); });
+			GPluginSDK->DelayFunctionCall(200+(GGame->Latency())/2, []() { CastFlash(); });
 
 
 
