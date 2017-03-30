@@ -46,6 +46,7 @@ IMenuOption* DrawQ;
 IMenuOption* DrawW;
 IMenuOption* DrawE;
 IMenuOption* DrawR;
+IMenuOption* DrawDmg;
 IMenuOption* FlashCondemn;
 
 ISpell2* Q;
@@ -53,6 +54,7 @@ ISpell2* W;
 ISpell2* E;
 ISpell2* R;
 ISpell2* Flash;
+ISpell2* EFlash;
 
 IUnit* myHero;
 
@@ -95,13 +97,14 @@ void Menu()
 	Fleemode = MiscMenu->AddKey("Flee Mode Key", 75);
 	autoQ = MiscMenu->CheckBox("Use Q Automatically", true);
 	gapcloseE = MiscMenu->CheckBox("Use E on Gap Closers", true);
-	interruptE = MiscMenu->CheckBox("Use E for to Interrupt Spells", true);
+	interruptE = MiscMenu->CheckBox("Use E to Interrupt Spells", true);
 	ComboAALevel = MiscMenu->AddInteger("At what level disable AA", 1, 18, 6);
 	ComboAA = MiscMenu->CheckBox("Disable AA", false);
 	ComboAAkey = MiscMenu->AddKey("Disable key", 32);
 	FlashCondemn = MiscMenu->AddKey("Flash Charm key", 84);
 
 
+	DrawDmg = Drawings->CheckBox("Draw Damage Calaclations", true);
 	DrawReady = Drawings->CheckBox("Draw Ready Spells", true);
 	DrawQ = Drawings->CheckBox("Draw Q", true);
 	DrawW = Drawings->CheckBox("Draw W", true);
@@ -125,6 +128,8 @@ void LoadSpells()
 	W->SetOverrideRange(580);
 	E = GPluginSDK->CreateSpell2(kSlotE, kLineCast, false, false, static_cast<eCollisionFlags>(kCollidesWithMinions | kCollidesWithYasuoWall));
 	E->SetSkillshot(0.25f, 60, 1550, 930);
+	EFlash = GPluginSDK->CreateSpell2(kSlotE, kLineCast, false, false, static_cast<eCollisionFlags>(kCollidesWithMinions | kCollidesWithYasuoWall));
+	EFlash->SetSkillshot(0.25f, 60, 3100, 1350);
 	R = GPluginSDK->CreateSpell2(kSlotR, kTargetCast, false, false, kCollidesWithNothing);
 	R->SetOverrideRange(600);
 
@@ -168,29 +173,6 @@ void AntiGapclose(GapCloserSpell const& args)
 	}
 }
 
-void PerformFlashCharm()
-{
-	GGame->IssueOrder(GEntityList->Player(), kMoveTo, GGame->CursorPosition());
-	if (E->IsReady() && Flash->IsReady())
-	{
-		auto pushDistance = 450;
-		auto target = GTargetSelector->GetFocusedTarget() != nullptr
-			? GTargetSelector->GetFocusedTarget()
-			: GTargetSelector->FindTarget(QuickestKill, SpellDamage, E->Range());
-
-		auto flashPosition = GEntityList->Player()->ServerPosition().Extend(GGame->CursorPosition(), Flash->Range());
-		AdvPredictionOutput result;
-		E->RunPrediction(target, false, kCollidesWithMinions, &result);
-
-		if (target != nullptr && target->IsValidTarget() && !target->IsDead() && !target->IsInvulnerable() && result.HitChance >= kHitChanceVeryHigh)
-		{
-			E->CastOnTarget(target, kHitChanceVeryHigh);
-				Flash->CastOnPosition(flashPosition);
-			
-		}
-	}
-}
-
 
 void AntiInterrupt(InterruptibleSpell const& args)
 {
@@ -201,48 +183,88 @@ void AntiInterrupt(InterruptibleSpell const& args)
 	}
 }
 
+Vec3 getPosToEflash(Vec3 target)
+{
+	return target + (GEntityList->Player()->GetPosition() - target) / 2;
+}
+
+void CastFlash() {
+	auto target = GTargetSelector->GetFocusedTarget() != nullptr
+		? GTargetSelector->GetFocusedTarget()
+		: GTargetSelector->FindTarget(QuickestKill, SpellDamage, EFlash->Range());
+	Flash->CastOnPosition(getPosToEflash(target->GetPosition()));
+}
+
+void PerformFlashCharm()
+{
+	GGame->IssueOrder(GEntityList->Player(), kMoveTo, GGame->CursorPosition());
+	if (E->IsReady() && Flash->IsReady())
+	{
+		auto target = GTargetSelector->GetFocusedTarget() != nullptr
+			? GTargetSelector->GetFocusedTarget()
+			: GTargetSelector->FindTarget(QuickestKill, SpellDamage, EFlash->Range());
+
+
+		auto flashPosition = GEntityList->Player()->ServerPosition().Extend(GGame->CursorPosition(), Flash->Range());
+		AdvPredictionOutput result;
+		EFlash->RunPrediction(target, false, kCollidesWithMinions, &result);
+
+		if (target != nullptr && target->IsValidTarget() && !target->IsDead() && !target->IsInvulnerable() && result.HitChance >= kHitChanceVeryHigh)
+		{
+			EFlash->CastOnTarget(target, kHitChanceVeryHigh);
+			GPluginSDK->DelayFunctionCall(E->GetDelay() + GGame->Latency() / 2, []() { CastFlash(); });
+
+
+
+
+
+		}
+	}
+}
+
 
 void dmgdraw()
 {
-
-	for (auto hero : GEntityList->GetAllHeros(false, true))
-	{
-		Vec2 barPos = Vec2();
-		if (hero->GetHPBarPosition(barPos) && !hero->IsDead())
+	if (DrawDmg->Enabled()) {
+		for (auto hero : GEntityList->GetAllHeros(false, true))
 		{
-			float QDamage = 0;
-			float WDamage = 0;
-			float EDamage = 0;
-			float RDamage = 0;
-			if (W->IsReady()) {
-				WDamage = GDamage->GetSpellDamage(GEntityList->Player(), hero, kSlotW);
-			}
-			if (Q->IsReady()) {
-				QDamage = GDamage->GetSpellDamage(GEntityList->Player(), hero, kSlotQ) + GDamage->GetAutoAttackDamage(GEntityList->Player(), hero, true);
-			}
-			if (E->IsReady()) {
-				EDamage = GDamage->GetSpellDamage(GEntityList->Player(), hero, kSlotE);
-			}
-			if (R->IsReady()) {
-				RDamage = GDamage->GetSpellDamage(GEntityList->Player(), hero, kSlotR);
-			}
-			float totalDamage = QDamage + WDamage + EDamage + RDamage;
-			float percentHealthAfterDamage = max(0, hero->GetHealth() - float(totalDamage)) / hero->GetMaxHealth();
-			float yPos = barPos.y + yOffset;
-			float xPosDamage = (barPos.x + xOffset) + Width * percentHealthAfterDamage;
-			float xPosCurrentHp = barPos.x + xOffset + Width * (hero->GetHealth() / hero->GetMaxHealth());
-			if (!hero->IsDead() && hero->IsValidTarget())
+			Vec2 barPos = Vec2();
+			if (hero->GetHPBarPosition(barPos) && !hero->IsDead())
 			{
-				float differenceInHP = xPosCurrentHp - xPosDamage;
-				float pos1 = barPos.x + 9 + (107 * percentHealthAfterDamage);
-
-				for (int i = 0; i < differenceInHP; i++)
-				{
-					GRender->DrawLine(Vec2(pos1 + i, yPos), Vec2(pos1 + i, yPos + Height), FillColor);
+				float QDamage = 0;
+				float WDamage = 0;
+				float EDamage = 0;
+				float RDamage = 0;
+				if (W->IsReady()) {
+					WDamage = GDamage->GetSpellDamage(GEntityList->Player(), hero, kSlotW);
 				}
-				if (!hero->IsVisible())
+				if (Q->IsReady()) {
+					QDamage = GDamage->GetSpellDamage(GEntityList->Player(), hero, kSlotQ) + GDamage->GetAutoAttackDamage(GEntityList->Player(), hero, true);
+				}
+				if (E->IsReady()) {
+					EDamage = GDamage->GetSpellDamage(GEntityList->Player(), hero, kSlotE);
+				}
+				if (R->IsReady()) {
+					RDamage = GDamage->GetSpellDamage(GEntityList->Player(), hero, kSlotR);
+				}
+				float totalDamage = QDamage + WDamage + EDamage + RDamage;
+				float percentHealthAfterDamage = max(0, hero->GetHealth() - float(totalDamage)) / hero->GetMaxHealth();
+				float yPos = barPos.y + yOffset;
+				float xPosDamage = (barPos.x + xOffset) + Width * percentHealthAfterDamage;
+				float xPosCurrentHp = barPos.x + xOffset + Width * (hero->GetHealth() / hero->GetMaxHealth());
+				if (!hero->IsDead() && hero->IsValidTarget())
 				{
+					float differenceInHP = xPosCurrentHp - xPosDamage;
+					float pos1 = barPos.x + 9 + (107 * percentHealthAfterDamage);
 
+					for (int i = 0; i < differenceInHP; i++)
+					{
+						GRender->DrawLine(Vec2(pos1 + i, yPos), Vec2(pos1 + i, yPos + Height), FillColor);
+					}
+					if (!hero->IsVisible())
+					{
+
+					}
 				}
 			}
 		}
