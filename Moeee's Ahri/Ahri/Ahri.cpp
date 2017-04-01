@@ -1,5 +1,9 @@
 #include "PluginSDK.h"
-
+#include <algorithm>
+#include "Template.h"
+#include "cmath"
+#include "Extension.h"
+#include <map>
 
 PluginSetup("Moeee's Ahri");
 
@@ -68,7 +72,7 @@ Vec4 FillColor = Vec4(198, 176, 5, 255);
 
 void Menu()
 {
-	MainMenu = GPluginSDK->AddMenu("Moeee's Ahri");
+	MainMenu = GPluginSDK->AddMenu("Moeees Ahri");
 
 	ComboMenu = MainMenu->AddMenu("Combo");
 	HarassMenu = MainMenu->AddMenu("Harass");
@@ -119,6 +123,8 @@ void Menu()
 
 
 
+
+
 void LoadSpells()
 {
 
@@ -146,6 +152,7 @@ void LoadSpells()
 }
 
 
+
 static bool IsImmune(IUnit* target)
 {
 	return target->HasBuff("BlackShield") || target->HasBuff("SivirE") || target->HasBuff("NocturneShroudofDarkness") ||
@@ -167,9 +174,9 @@ void CastE(IUnit* target)
 void AntiGapclose(GapCloserSpell const& args)
 {
 	auto player = GEntityList->Player();
-	if (gapcloseE->Enabled() && E->IsReady() && player->IsValidTarget(args.Sender, E->Range()) && args.Sender != nullptr && args.Sender != GEntityList->Player() && args.Sender->IsEnemy(GEntityList->Player()))
+	if (gapcloseE->Enabled() && E->IsReady() && player->IsValidTarget(args.Source, E->Range()) && args.Source != nullptr && args.Source != GEntityList->Player() && args.Source->IsEnemy(GEntityList->Player()))
 	{
-		E->CastOnTarget(args.Sender, kHitChanceVeryHigh);
+		E->CastOnTarget(args.Source, kHitChanceVeryHigh);
 	}
 }
 
@@ -177,9 +184,9 @@ void AntiGapclose(GapCloserSpell const& args)
 void AntiInterrupt(InterruptibleSpell const& args)
 {
 	auto player = GEntityList->Player();
-	if (interruptE->Enabled() && E->IsReady() && player->IsValidTarget(args.Target, E->Range()) && args.Target != nullptr && args.Target != GEntityList->Player() && args.Target->IsEnemy(GEntityList->Player()))
+	if (interruptE->Enabled() && E->IsReady() && player->IsValidTarget(args.Source, E->Range()) && args.Source != nullptr && args.Source != GEntityList->Player() && args.Source->IsEnemy(GEntityList->Player()))
 	{
-		CastE(args.Target);
+		CastE(args.Source);
 	}
 }
 
@@ -333,27 +340,22 @@ void Harass()
 
 }
 
+
+
 void LaneClear()
 {
 	auto player = GEntityList->Player();
+	auto pred = FindBestLineCastPosition(vector<Vec3>{ GEntityList->Player()->GetPosition() }, 900, Q->Range(), Q->Radius(), true, true);
+	if (LaneClearQ->Enabled() && player->ManaPercent() >= LaneClearManaManager->GetFloat() && pred.HitCount >= LaneClearMin->GetInteger()) {
+		Q->CastOnPosition(pred.CastPosition);
 
-	for (auto minion : GEntityList->GetAllMinions(false, true, false))
-	{
-		if (minion != nullptr && minion->IsValidTarget(GEntityList->Player(), Q->Range()) && LaneClearQ->Enabled() && player->ManaPercent() >= LaneClearManaManager->GetFloat())
-		{
-			Vec3 pos;
-			int Qhit;
-			GPrediction->FindBestCastPosition(Q->Range(), Q->Radius(), true, true, false, pos, Qhit);
-			if (Qhit >= LaneClearMin->GetInteger())
-
-			{
-				Q->CastOnPosition(pos);
-			}
-		}
 	}
-
-
 }
+
+
+
+
+
 
 void FleeMode()
 {

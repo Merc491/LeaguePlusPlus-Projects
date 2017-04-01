@@ -1,7 +1,15 @@
 ﻿C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V140\Microsoft.CppBuild.targets(392,5): warning MSB8028: The intermediate directory (Release\) contains files shared from another project (Ahri.vcxproj, MoeeeAhri.vcxproj).  This can lead to incorrect clean and rebuild behavior.
+  Ahri.cpp
+c:\users\moe\documents\github\leagueplusplus-projects\moeee's ahri\ahri\Geometry.h(64): warning C4244: 'argument': conversion from 'double' to 'const float', possible loss of data
+c:\users\moe\documents\github\leagueplusplus-projects\moeee's ahri\ahri\Extension.h(359): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+Ahri.cpp(247): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+Ahri.cpp(250): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+Ahri.cpp(253): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+Ahri.cpp(256): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+  PluginSDK.cpp
      Creating library C:\Users\Moe\Documents\GitHub\LeaguePlusPlus-Projects\Moeee's Ahri\Release\MoeeesAhri.lib and object C:\Users\Moe\Documents\GitHub\LeaguePlusPlus-Projects\Moeee's Ahri\Release\MoeeesAhri.exp
   Generating code
-  0 of 154 functions ( 0.0%) were compiled, the rest were copied from previous compilation.
+  0 of 701 functions ( 0.0%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
     0 functions had inline decision re-evaluated but remain unchanged
   Finished generating code

@@ -147,6 +147,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\..\..\Desktop\MalachiteAIO\MalachiteAIO\Template.h" />
+    <ClInclude Include="..\..\Moeee%27s Ahri\Ahri\Extension.h" />
+    <ClInclude Include="Geometry.h" />
+    <ClInclude Include="..\..\Moeee%27s Ahri\Ahri\Template.h" />
     <ClInclude Include="Vector3.h" />
     <ClInclude Include="PluginSDK.h" />
     <ClInclude Include="PluginData.h" />
