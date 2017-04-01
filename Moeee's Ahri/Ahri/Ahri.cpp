@@ -133,7 +133,7 @@ void LoadSpells()
 	W = GPluginSDK->CreateSpell2(kSlotW, kTargetCast, false, false, kCollidesWithNothing);
 	W->SetOverrideRange(580);
 	E = GPluginSDK->CreateSpell2(kSlotE, kLineCast, false, false, static_cast<eCollisionFlags>(kCollidesWithMinions | kCollidesWithYasuoWall));
-	E->SetSkillshot(0.25f, 60, 1550, 930);
+	E->SetSkillshot(0.25f, 60, 1550, 940);
 	EFlash = GPluginSDK->CreateSpell2(kSlotE, kLineCast, false, false, static_cast<eCollisionFlags>(kCollidesWithMinions | kCollidesWithYasuoWall));
 	EFlash->SetSkillshot(0.25f, 60, 3100, 1350);
 	R = GPluginSDK->CreateSpell2(kSlotR, kTargetCast, false, false, kCollidesWithNothing);
@@ -290,7 +290,7 @@ void Combo()
 
 	if (ComboE->Enabled() && E->IsReady() && player->IsValidTarget(target, E->Range()) && GEntityList->Player()->GetMana() > R->ManaCost() + E->ManaCost() && !IsImmune(target))
 	{
-		CastE(target);
+		E->CastOnTarget(target, kHitChanceVeryHigh);
 
 	}
 
